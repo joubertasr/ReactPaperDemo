@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./App.css";
 import Paper from "paper";
 import PaperCanvas from "./components/PaperCanvas/PaperCanvas";
+import DrawingCanvas from "./components/DrawingCanvas/DrawingCanvas";
 
 const paperScope = new Paper.PaperScope();
 function App() {
@@ -30,7 +31,7 @@ function App() {
         </button>
       </header>
       <div>
-        <PaperCanvas height={200} tool={tool} paperScope={paperScope} />
+        <DrawingCanvas height={200} tool={tool} paperScope={paperScope} />
       </div>
     </div>
   );
