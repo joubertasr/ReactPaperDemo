@@ -1,3 +1,4 @@
+import { eventNames } from "process";
 import React, { useEffect, useRef, useState } from "react";
 import PaperCanvas from "../PaperCanvas/PaperCanvas";
 import "./DrawingCanvas.scss";
@@ -16,6 +17,7 @@ const DrawingCanvas: React.FC<Props> = (props) => {
   let paperProject: paper.Project;
   console.log("PaperCanvas", paperScope, canvasRef, tool);
   let selectedItem: paper.Item | null;
+  let altKey: boolean = false;
 
   let transform: "resize" | "move" = "resize";
 
@@ -27,8 +29,7 @@ const DrawingCanvas: React.FC<Props> = (props) => {
     const canvas = canvasRef.current;
     if (canvas) {
       paperScope.setup(canvas);
-      paperScope.view.onMouseUp = onMouseUp;
-      console.log("Setup canvas", canvas);
+      paperScope.tools.push(new paperScope.Tool());
     } else {
       console.error("No canvas");
     }
@@ -39,6 +40,8 @@ const DrawingCanvas: React.FC<Props> = (props) => {
       paperScope.view.onMouseUp = onMouseUp;
       paperScope.view.onMouseDown = onMouseDown;
       paperScope.view.onMouseDrag = onMouseDrag;
+      paperScope.tool.onKeyDown = onKeyDown;
+      paperScope.tool.onKeyUp = onKeyUp;
     }
     console.log("Setup Events", tool);
   }, [tool]);
@@ -98,13 +101,17 @@ const DrawingCanvas: React.FC<Props> = (props) => {
       }
       transform = "resize";
     } else {
-      hit.item.selected = true;
-      if (hit.type === "fill") {
-        transform = "move";
+      if (altKey) {
+        hit.item.remove();
       } else {
-        transform = "resize";
+        hit.item.selected = true;
+        if (hit.type === "fill") {
+          transform = "move";
+        } else {
+          transform = "resize";
+        }
+        selectedItem = hit.item;
       }
-      selectedItem = hit.item;
     }
   };
 
@@ -123,6 +130,16 @@ const DrawingCanvas: React.FC<Props> = (props) => {
     }
   };
 
+  const onKeyDown = (event: paper.KeyEvent) => {
+    if (event.key === "shift") {
+      altKey = true;
+    }
+  };
+  const onKeyUp = (event: paper.KeyEvent) => {
+    if (event.key === "shift") {
+      altKey = false;
+    }
+  };
   return (
     <PaperCanvas
       height={props.height}
