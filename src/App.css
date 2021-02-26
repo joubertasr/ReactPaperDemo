@@ -22,9 +22,19 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
-
+.Row {
+  flex-direction: row;
+}
 .App-link {
+  padding: 8px;
+  border-radius: 4px;
   color: #61dafb;
+  border: 1px solid white;
+  background-color: #282c34;
+}
+.App-link-selected {
+  border: 1px solid #61dafb;
+  background-color: #484c64;
 }
 
 @keyframes App-logo-spin {

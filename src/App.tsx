@@ -11,27 +11,33 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h2>Paper JS Demo</h2>
-        <button
-          className="App-link"
-          onClick={() => {
-            setTool("Circle");
-            return false;
-          }}
-        >
-          Circle
-        </button>
-        <button
-          className="App-link"
-          onClick={() => {
-            setTool("Rectangle");
-            return false;
-          }}
-        >
-          Rectangle
-        </button>
+        <div className="Row">
+          <button
+            className={`App-link ${
+              tool === "Circle" ? "App-link-selected" : ""
+            }`}
+            onClick={() => {
+              setTool("Circle");
+              return false;
+            }}
+          >
+            Circle
+          </button>
+          <button
+            className={`App-link ${
+              tool === "Rectangle" ? "App-link-selected" : ""
+            }`}
+            onClick={() => {
+              setTool("Rectangle");
+              return false;
+            }}
+          >
+            Rectangle
+          </button>
+        </div>
       </header>
       <div>
-        <DrawingCanvas height={200} tool={tool} paperScope={paperScope} />
+        <DrawingCanvas height={800} tool={tool} paperScope={paperScope} />
       </div>
     </div>
   );
