@@ -15,7 +15,9 @@ const DrawingCanvas: React.FC<Props> = (props) => {
   const { paperScope, tool } = props;
   let paperProject: paper.Project;
   console.log("PaperCanvas", paperScope, canvasRef, tool);
-  let selectedItem: paper.Path.Circle | paper.Path.Rectangle | null;
+  let selectedItem: paper.Item | null;
+
+  let transform: "resize" | "move" = "resize";
 
   const setupPaperProject = () => {
     paperProject = paperScope.project;
@@ -48,8 +50,9 @@ const DrawingCanvas: React.FC<Props> = (props) => {
   const drawCircle = (e: paper.MouseEvent) => {
     const circle = new paperScope.Path.Circle(e.point, 20);
     circle.translate(new paperScope.Point([-20, -20]));
-    circle.strokeWidth = 1;
+    circle.strokeWidth = 3;
     circle.strokeColor = new paperScope.Color("Black");
+    circle.fillColor = new paperScope.Color("White");
     circle.selected = true;
 
     paperProject.activeLayer.addChild(circle);
@@ -62,8 +65,10 @@ const DrawingCanvas: React.FC<Props> = (props) => {
       new paperScope.Size(50, 50)
     );
     rectangle.translate(new paperScope.Point([-50, -50]));
-    rectangle.strokeWidth = 1;
+    rectangle.strokeWidth = 3;
     rectangle.strokeColor = new paperScope.Color("Black");
+    rectangle.fillColor = new paperScope.Color("White");
+    rectangle.selected = true;
 
     paperProject.activeLayer.addChild(rectangle);
     selectedItem = rectangle;
@@ -75,20 +80,44 @@ const DrawingCanvas: React.FC<Props> = (props) => {
   };
 
   const onMouseDown = (event: paper.MouseEvent) => {
-    switch (tool) {
-      case "Circle":
-        drawCircle(event);
-        break;
-      case "Rectangle":
-        drawRectangle(event);
-        break;
+    const hitOptions = {
+      segments: true,
+      stroke: true,
+      fill: true,
+      tolerance: 5,
+    };
+    const hit = paperScope.project.hitTest(event.point, hitOptions);
+    if (!hit) {
+      switch (tool) {
+        case "Circle":
+          drawCircle(event);
+          break;
+        case "Rectangle":
+          drawRectangle(event);
+          break;
+      }
+      transform = "resize";
+    } else {
+      hit.item.selected = true;
+      if (hit.type === "fill") {
+        transform = "move";
+      } else {
+        transform = "resize";
+      }
+      selectedItem = hit.item;
     }
   };
 
   const onMouseDrag = (event: paper.MouseEvent) => {
     if (selectedItem) {
-      selectedItem.bounds.width += event.delta.x;
-      selectedItem.bounds.height += event.delta.y;
+      if (transform === "resize") {
+        selectedItem.bounds.width += event.delta.x;
+        selectedItem.bounds.height += event.delta.y;
+      }
+      if (transform === "move") {
+        selectedItem.bounds.center.x += event.delta.x;
+        selectedItem.bounds.center.y += event.delta.y;
+      }
     } else {
       console.log("no selected item");
     }
